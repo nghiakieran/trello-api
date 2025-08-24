@@ -3,6 +3,7 @@ import express from 'express'
 import exitHook from 'async-exit-hook'
 import { CLOSE_DB, CONNECT_DB } from './config/mongodb'
 import { env } from './config/environment'
+import { APIs_V1 } from './routes/v1'
 
 const START_SERVER = () => {
   const app = express()
@@ -10,7 +11,9 @@ const START_SERVER = () => {
   const hostname = env.APP_HOST
   const port = env.APP_PORT
 
-  app.get('/', async (req, res) => {
+  app.use('/v1', APIs_V1)
+
+  app.get('/', (req, res) => {
     res.end('<h1>Hello World!</h1>')
   })
 
