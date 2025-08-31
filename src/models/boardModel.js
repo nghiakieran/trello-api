@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { BOARD_TYPES } from '~/utils/constants'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
-import { columnModel} from '~/models/columnModel'
+import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
 
 const BOARD_COLLECTION_NAME = 'boards'
@@ -68,7 +68,7 @@ const getDetails = async (id) => {
       } }
     ]).toArray()
 
-    return result[0] || {}
+    return result[0] || null
   } catch (error) {
     throw new Error(error)
   }
