@@ -10,6 +10,24 @@ const createNew = async (req, res, next) => {
   }
 }
 
+const verifyAccount = async (req, res, next) => {
+  try {
+    const result = await userService.verifyAccount(req.body)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const login = async (req, res, next) => {
+  try {
+    const result = await userService.login(req.body)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) {
+    next(error)
+  }
+}
+
 const deleteOneById = async (req, res, next) => {
   try {
     const result = await userService.deleteOneById(req.params.userId)
@@ -21,5 +39,7 @@ const deleteOneById = async (req, res, next) => {
 
 export const userController = {
   createNew,
+  verifyAccount,
+  login,
   deleteOneById
 }
