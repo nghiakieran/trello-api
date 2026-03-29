@@ -82,6 +82,17 @@ const update = async (userId, updateData) => {
   }
 }
 
+const deleteOneById = async (userId) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).deleteOne({
+      _id: new ObjectId(String(userId))
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -89,5 +100,6 @@ export const userModel = {
   createNew,
   findOneById,
   findOneByEmail,
-  update
+  update,
+  deleteOneById
 }

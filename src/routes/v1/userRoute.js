@@ -7,4 +7,7 @@ const Router = express.Router()
 Router.route('/register')
   .post(userValidation.createNew, userController.createNew)
 
+Router.route('/:userId')
+  .delete(userController.deleteOneById)
+
 export const userRoute = Router

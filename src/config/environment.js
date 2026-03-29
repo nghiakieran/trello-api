@@ -9,5 +9,7 @@ export const env = {
 
   BUILD_MODE: process.env.BUILD_MODE,
 
-  AUTHOR: process.env.AUTHOR
+  AUTHOR: process.env.AUTHOR,
+
+  RESEND: process.env.RESEND_API_KEY
 }
