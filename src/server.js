@@ -7,12 +7,21 @@ import { env } from './config/environment'
 import { APIs_V1 } from './routes/v1'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 import { corsOptions } from './config/cors'
+import cookieParser from 'cookie-parser'
 
 const START_SERVER = () => {
   const app = express()
 
   const hostname = env.APP_HOST
   const port = env.APP_PORT
+
+  // Hanle case: Cache from disk
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
+
+  app.use(cookieParser())
 
   app.use(cors(corsOptions))
 

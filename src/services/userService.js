@@ -67,10 +67,34 @@ const login = async (reqBody) => {
     email: existUser.email
   }
 
-  const accessToken = await jwtProvider.generateToken(userInfo, env.ACCESS_TOKEN_SECRET_SIGNATURE, env.ACCESS_TOKEN_LIFE)
-  const refreshToken = await jwtProvider.generateToken(userInfo, env.REFRESH_TOKEN_SECRET_SIGNATURE, env.REFRESH_TOKEN_LIFE)
+  const accessToken = await jwtProvider.generateToken(
+    userInfo,
+    env.ACCESS_TOKEN_SECRET_SIGNATURE,
+    env.ACCESS_TOKEN_LIFE
+  )
+  const refreshToken = await jwtProvider.generateToken(
+    userInfo,
+    env.REFRESH_TOKEN_SECRET_SIGNATURE,
+    env.REFRESH_TOKEN_LIFE
+  )
 
   return { accessToken, refreshToken, ...pickUser(existUser) }
+}
+
+const refreshToken = async (clientRefreshToken) => {
+  const refreshTokenDecoded = await jwtProvider.verifyToken(clientRefreshToken, env.REFRESH_TOKEN_SECRET_SIGNATURE)
+
+  const userInfo = {
+    _id: refreshTokenDecoded._id,
+    email: refreshTokenDecoded.email
+  }
+
+  const accessToken = await jwtProvider.generateToken(
+    userInfo,
+    env.ACCESS_TOKEN_SECRET_SIGNATURE,
+    env.ACCESS_TOKEN_LIFE
+  )
+  return { accessToken }
 }
 
 const deleteOneById = async (userId) => {
@@ -88,5 +112,6 @@ export const userService = {
   createNew,
   verifyAccount,
   login,
+  refreshToken,
   deleteOneById
 }
