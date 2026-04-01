@@ -15,7 +15,7 @@ const createNew = async (reqBody) => {
   console.log(existUser)
 
   if (existUser) {
-    throw new ApiError(StatusCodes.CONFLICT, 'Email already exists')
+    throw new ApiError(StatusCodes.CONFLICT, 'Email already exists!')
   }
 
   const nameFromEmail = reqBody.email.split('@')[0]
@@ -38,7 +38,7 @@ const createNew = async (reqBody) => {
 const verifyAccount = async (reqBody) => {
   const existUser = await userModel.findOneByEmail(reqBody.email)
 
-  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found')
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found!')
   if (existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is already active!')
   if (reqBody.token !== existUser.verifyToken) {
     throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Token is invalid!')
@@ -56,10 +56,10 @@ const verifyAccount = async (reqBody) => {
 const login = async (reqBody) => {
   const existUser = await userModel.findOneByEmail(reqBody.email)
 
-  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found')
-  if (!existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is not active')
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found!')
+  if (!existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is not active!')
   if (!bcrypt.compareSync(reqBody.password, existUser.password)) {
-    throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Email or Password is incorrect')
+    throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Email or Password is incorrect!')
   }
 
   const userInfo = {
@@ -97,11 +97,35 @@ const refreshToken = async (clientRefreshToken) => {
   return { accessToken }
 }
 
+const update = async (userId, reqBody) => {
+  const existUser = await userModel.findOneById(userId)
+
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found!')
+  if (!existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your account is not active!')
+
+  let updatedUser = {}
+
+  // Change password
+  if (reqBody.current_password && reqBody.new_password) {
+    if (!bcrypt.compareSync(reqBody.current_password, existUser.password)) {
+      throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Your Current Password is incorrect!')
+    }
+
+    updatedUser = await userModel.update(existUser._id, {
+      password: bcrypt.hashSync(reqBody.new_password, 8)
+    })
+  } else {
+    updatedUser = await userModel.update(existUser._id, reqBody)
+  }
+
+  return pickUser(updatedUser)
+}
+
 const deleteOneById = async (userId) => {
   const foundUser = await userModel.findOneById(userId)
 
   if (!foundUser) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
   }
 
   await userModel.deleteOneById(userId)
@@ -113,5 +137,6 @@ export const userService = {
   verifyAccount,
   login,
   refreshToken,
+  update,
   deleteOneById
 }
