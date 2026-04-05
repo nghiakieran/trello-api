@@ -8,6 +8,7 @@ import { pickUser } from '~/utils/formatters'
 import { resendProvider } from '~/providers/ResendProvider'
 import { jwtProvider } from '~/providers/JwtProvider'
 import { env } from '~/config/environment'
+import { cloudinaryProvider } from '~/providers/CloudinaryProvider'
 
 const createNew = async (reqBody) => {
   const existUser = await userModel.findOneByEmail(reqBody.email)
@@ -97,7 +98,7 @@ const refreshToken = async (clientRefreshToken) => {
   return { accessToken }
 }
 
-const update = async (userId, reqBody) => {
+const update = async (userId, reqBody, userAvatarFile) => {
   const existUser = await userModel.findOneById(userId)
 
   if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'Account not found!')
@@ -113,6 +114,11 @@ const update = async (userId, reqBody) => {
 
     updatedUser = await userModel.update(existUser._id, {
       password: bcrypt.hashSync(reqBody.new_password, 8)
+    })
+  } else if (userAvatarFile) {
+    const uploadResult = await cloudinaryProvider.streamUpload(userAvatarFile.buffer, 'users')
+    updatedUser = await userModel.update(existUser._id, {
+      avatar: uploadResult.secure_url
     })
   } else {
     updatedUser = await userModel.update(existUser._id, reqBody)
